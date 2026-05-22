@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zephyr Minigames ⚛️</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #ff0055;
+      --text: #f8fafc;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 { margin-bottom: 1.5rem; font-size: 2rem; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.3); }
+    .menu { display: flex; gap: 10px; margin-bottom: 1.5rem; width: 100%; max-width: 400px; }
+    .tab-btn {
+      flex: 1; padding: 0.8rem; background: var(--card); border: 1px solid #334155;
+      color: var(--text); font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s;
+    }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); }
+    .game-container {
+      background: var(--card); border-radius: 16px; padding: 1.5rem;
+      width: 100%; max-width: 400px; display: none; flex-direction: column; align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .game-container.active { display: flex; }
+    
+    /* Estilos de los juegos */
+    canvas { background: #000; border-radius: 8px; max-width: 100%; display: block; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 240px; margin: 1rem 0; }
+    .cell {
+      width: 75px; height: 75px; background: #0f172a; border: 2px solid #334155;
+      border-radius: 8px; font-size: 2rem; font-weight: bold; color: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .status { margin-bottom: 1rem; font-size: 1.1rem; font-weight: bold; }
+    .btn {
+      margin-top: 0.5rem; padding: 0.6rem 1.5rem; background: #00ffcc; color: #000;
+      border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+    }
+
+    /* Controles Táctiles para el celular */
+    .controls {
+      display: grid;
+      grid-template-areas: 
+        ". up ."
+        "left . right"
+        ". down .";
+      gap: 10px;
+      margin-top: 1.5rem;
+      width: 180px;
+    }
+    .dpad-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px #1e293b;
+    }
+    .dpad-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px #1e293b;
+    }
+    #btn-up { grid-area: up; }
+    #btn-left { grid-area: left; }
+    #btn-right { grid-area: right; }
+    #btn-down { grid-area: down; }
+  </style>
+</head>
+<body>
+
+  <h1>Zephyr Minigames ⚛️</h1>
+
+  <div class="menu">
+    <button class="tab-btn active" onclick="openGame('snake')">Snake</button>
+    <button class="tab-btn" onclick="openGame('tictactoe')">Gato</button>
+    <button class="tab-btn" onclick="openGame('pong')">Pong</button>
+  </div>
+
+  <div id="snake" class="game-container active">
+    <div class="status">Puntos: <span id="score">0</span></div>
+    <canvas id="snakeCanvas" width="300" height="300"></canvas>
+    
+    <div class="controls">
+      <button class="dpad-btn" id="btn-up" onclick="changeDirection('UP')">▲</button>
+      <button class="dpad-btn" id="btn-left" onclick="changeDirection('LEFT')">◀</button>
+      <button class="dpad-btn" id="btn-right" onclick="changeDirection('RIGHT')">▶</button>
+      <button class="dpad-btn" id="btn-down" onclick="changeDirection('DOWN')">▼</button>
+    </div>
+    <button class="btn" style="margin-top:1.5rem;" onclick="initSnake()">Reiniciar</button>
+  </div>
+
+  <div id="tictactoe" class="game-container">
+    <div id="gatoStatus" class="status">Turno de X</div>
+    <div class="grid">
+      <div class="cell" onclick="makeMove(this, 0)"></div>
+      <div class="cell" onclick="makeMove(this, 1)"></div>
+      <div class="cell" onclick="makeMove(this, 2)"></div>
+      <div class="cell" onclick="makeMove(this, 3)"></div>
+      <div class="cell" onclick="makeMove(this, 4)"></div>
+      <div class="cell" onclick="makeMove(this, 5)"></div>
+      <div class="cell" onclick="makeMove(this, 6)"></div>
+      <div class="cell" onclick="makeMove(this, 7)"></div>
+      <div class="cell" onclick="makeMove(this, 8)"></div>
+    </div>
+    <button class="btn" onclick="resetGato()">Reiniciar</button>
+  </div>
+
+  <div id="pong" class="game-container">
+    <canvas id="pongCanvas" width="300" height="350"></canvas>
+    <p style="margin-top:1rem; font-size:0.85rem; color:#94a3b8;">Toca los lados de la pantalla para mover la barra</p>
+    <button class="btn" onclick="initPong()">Reiniciar</button>
+  </div>
+
+  <script>
+    // Variables globales de los timers para poder matarlos al cambiar de juego
+    let snakeInterval = null;
+    let pongInterval = null;
+
+    function stopAllGames() {
+      clearInterval(snakeInterval);
+      clearInterval(pongInterval);
+      snakeInterval = null;
+      pongInterval = null;
+    }
+
+    function openGame(gameId) {
+      stopAllGames(); // Detiene absolutamente todo antes de cambiar
+      document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(gameId).classList.add('active');
+      event.target.classList.add('active');
+      
+      if(gameId === 'snake') initSnake();
+      if(gameId === 'pong') initPong();
+    }
+
+    // --- LÓGICA JUEGO: SNAKE ---
+    const sCanvas = document.getElementById('snakeCanvas');
+    const ctxS = sCanvas.getContext('2d');
+    let snake, food, dx, dy, score;
+
+    function initSnake() {
+      clearInterval(snakeInterval);
+      snake = [{x: 150, y: 150}, {x: 140, y: 150}, {x: 130, y: 150}];
+      dx = 10; dy = 0; score = 0;
+      document.getElementById('score').innerText = score;
+      genFood();
+      snakeInterval = setInterval(mainSnake, 120); // Velocidad equilibrada
+    }
+
+    function mainSnake() {
+      if (hasGameEnded()) { 
+        clearInterval(snakeInterval); 
+        alert("¡Perdiste! Puntuación: " + score); 
+        initSnake(); 
+        return; 
+      }
+      ctxS.fillStyle = '#000';
+      ctxS.fillRect(0, 0, sCanvas.width, sCanvas.height);
+      drawFood();
+      moveSnake();
+      drawSnake();
+    }
+
+    function drawSnake() { ctxS.fillStyle = '#00ffcc'; snake.forEach(p => ctxS.fillRect(p.x, p.y, 9, 9)); }
+    
+    function moveSnake() {
+      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+      snake.unshift(head);
+      if (snake[0].x === food.x && snake[0].y === food.y) { 
+        score += 10; 
+        document.getElementById('score').innerText = score; 
+        genFood(); 
+      } else { 
+        snake.pop(); 
+      }
+    }
+
+    function genFood() {
+      food = {
+        x: Math.floor(Math.random() * (sCanvas.width / 10)) * 10,
+        y: Math.floor(Math.random() * (sCanvas.height / 10)) * 10
+      };
+    }
+    function drawFood() { ctxS.fillStyle = '#ff0055'; ctxS.fillRect(food.x, food.y, 9, 9); }
+
+    function hasGameEnded() {
+      for (let i = 4; i < snake.length; i++) { if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true; }
+      return snake[0].x < 0 || snake[0].x >= sCanvas.width || snake[0].y < 0 || snake[0].y >= sCanvas.height;
+    }
+
+    // Sistema de control por botones corregido
+    function changeDirection(direction) {
+      if (direction === 'LEFT' && dx === 0) { dx = -10; dy = 0; }
+      if (direction === 'UP' && dy === 0) { dx = 0; dy = -10; }
+      if (direction === 'RIGHT' && dx === 0) { dx = 10; dy = 0; }
+      if (direction === 'DOWN' && dy === 0) { dx = 0; dy = 10; }
+    }
+
+    // --- LÓGICA JUEGO: GATO ---
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer = "X";
+    function makeMove(cell, index) {
+      if (board[index] === "" && !checkWin()) {
+        board[index] = currentPlayer;
+        cell.innerText = currentPlayer;
+        if (checkWin()) { document.getElementById('gatoStatus').innerText = `¡Ganador: ${currentPlayer}! 🎉`; }
+        else if (!board.includes("")) { document.getElementById('gatoStatus').innerText = "¡Empate! 🤝"; }
+        else { currentPlayer = currentPlayer === "X" ? "O" : "X"; document.getElementById('gatoStatus').innerText = `Turno de ${currentPlayer}`; }
+      }
+    }
+    function checkWin() {
+      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      return wins.some(r => board[r[0]] && board[r[0]] === board[r[1]] && board[r[0]] === board[r[2]]);
+    }
+    function resetGato() {
+      board = ["", "", "", "", "", "", "", "", ""]; currentPlayer = "X";
+      document.getElementById('gatoStatus').innerText = "Turno de X";
+      document.querySelectorAll('.cell').forEach(c => c.innerText = "");
+    }
+
+    // --- LÓGICA JUEGO: PONG ---
+    const pCanvas = document.getElementById('pongCanvas');
+    const ctxP = pCanvas.getContext('2d');
+    let paddleX, ballX, ballY, ballDX, ballDY;
+
+    function initPong() {
+      clearInterval(pongInterval);
+      paddleX = 110; ballX = 150; ballY = 50; ballDX = 3; ballDY = 3;
+      pongInterval = setInterval(mainPong, 16);
+    }
+    function mainPong() {
+      ballX += ballDX; ballY += ballDY;
+      if (ballX <= 0 || ballX >= pCanvas.width) ballDX *= -1;
+      if (ballY <= 0) ballDY *= -1;
+      if (ballY >= pCanvas.height - 20 && ballX >= paddleX && ballX <= paddleX + 80) { ballDY *= -1; ballY = pCanvas.height - 21; }
+      else if (ballY > pCanvas.height) { clearInterval(pongInterval); alert("Fin del juego!"); initPong(); return; }
+      
+      ctxP.fillStyle = '#000';
+      ctxP.fillRect(0, 0, pCanvas.width, pCanvas.height);
+      ctxP.fillStyle = '#00ffcc'; ctxP.fillRect(paddleX, pCanvas.height - 15, 80, 10);
+      ctxP.fillStyle = '#ff0055'; ctxP.beginPath(); ctxP.arc(ballX, ballY, 7, 0, Math.PI*2); ctxP.fill();
+    }
+    pCanvas.addEventListener('click', (e) => {
+      const rect = pCanvas.getBoundingClientRect();
+      if ((e.clientX - rect.left) < pCanvas.width / 2) { paddleX = Math.max(0, paddleX - 35); }
+      else { paddleX = Math.min(pCanvas.width - 80, paddleX + 35); }
+    });
+
+    // Arranca el juego inicial
+    initSnake();
+  </script>
+</body>
+</html>
+>
