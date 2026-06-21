@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yonistatto • Playa del Carmen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap');
+
+    /* ── SLAV font via system fallback stack that feels editorial ── */
+    :root {
+      --slav: 'Playfair Display', 'Georgia', serif; /* closest web-safe match to Slav / display serif */
+      --calibri: 'Calibri', 'Gill Sans', 'Trebuchet MS', sans-serif;
+      --ink: #0a0a0a;
+      --bone: #f0ede8;
+      --gold: #c8a96a;
+      --red:  #b83232;
+      --mid:  #1e1e1e;
+      --glass: rgba(255,255,255,0.04);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--bone);
+      font-family: var(--calibri);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: .6;
+    }
+
+    /* ── HERO ── */
+    header {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem;
+      overflow: hidden;
+    }
+
+    /* Decorative ink-splash SVG bg */
+    header::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,169,106,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(184,50,50,.06) 0%, transparent 60%);
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-eyebrow {
+      font-family: var(--calibri);
+      font-size: .75rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp .8s .2s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--slav);
+      font-size: clamp(4rem, 14vw, 11rem);
+      font-weight: 900;
+      line-height: .9;
+      letter-spacing: -.02em;
+      color: var(--bone);
+      text-shadow: 0 0 80px rgba(200,169,106,.18);
+      opacity: 0;
+      animation: fadeUp .9s .4s forwards;
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-sub {
+      font-family: var(--slav);
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: rgba(240,237,232,.55);
+      margin-top: 1.4rem;
+      opacity: 0;
+      animation: fadeUp .9s .6s forwards;
+    }
+
+    .hero-location {
+      display: inline-flex; align-items: center; gap: .5rem;
+      margin-top: 2.2rem;
+      font-family: var(--calibri);
+      font-size: .85rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,.4);
+      opacity: 0;
+      animation: fadeUp .9s .8s forwards;
+    }
+
+    .hero-location svg { flex-shrink: 0; }
+
+    /* ── DIVIDER ── */
+    .ornament {
+      text-align: center; color: var(--gold);
+      font-size: 1.4rem; letter-spacing: .6em;
+      opacity: .4; padding: .5rem 0;
+    }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── ABOUT ── */
+    .about {
+      padding: 6rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 3px 1fr;
+      gap: 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    .about-divider {
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      height: 100%;
+    }
+
+    .about-text h2 {
+      font-family: var(--slav);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: var(--bone);
+      margin-bottom: 1.2rem;
+      line-height: 1.1;
+    }
+
+    .about-text p {
+      font-family: var(--calibri);
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(240,237,232,.65);
+    }
+
+    .about-stat { text-align: center; }
+    .about-stat .number {
+      font-family: var(--slav);
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .about-stat .label {
+      font-family: var(--calibri);
+      font-size: .75rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,.35);
+      margin-top: .5rem;
+    }
+
+    /* Link proyectos anteriores */
+    .projects-link-container {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .link-projects {
+      font-family: var(--calibri);
+      font-size: 1rem;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border-bottom: 1px solid transparent;
+      transition: color .25s, border-color .25s, padding-left .25s;
+      padding: .3rem 0;
+      display: inline-flex;
+      align-items: center;
+    }
+    .link-projects:hover {
+      color: var(--bone);
+      border-color: var(--gold);
+    }
+
+    /* ── PRICING SECTION ── */
+    .pricing-section {
+      padding: 5rem 2rem;
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,.02), transparent);
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-heading h2 {
+      font-family: var(--slav);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      color: var(--bone);
+    }
+
+    .section-heading p {
+      font-family: var(--calibri);
+      font-size: .9rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: .5rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      border: 1px solid rgba(200,169,106,.18);
+      background: var(--glass);
+      backdrop-filter: blur(4px);
+      padding: 2.2rem 1.8rem;
+      position: relative;
+      transition: border-color .3s, transform .3s;
+      cursor: default;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 3px; height: 0;
+      background: var(--gold);
+      transition: height .4s ease;
+    }
+    .pricing-card:hover { border-color: rgba(200,169,106,.45); transform: translateY(-4px); }
+    .pricing-card:hover::before { height: 100%; }
+
+    .pricing-card .icon {
+      font-size: 2rem; margin-bottom: 1rem; display: block;
+    }
+    .pricing-card h3 {
+      font-family: var(--slav);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--bone);
+      margin-bottom: .6rem;
+    }
+    .pricing-card p {
+      font-family: var(--calibri);
+      font-size: .9rem;
+      color: rgba(240,237,232,.5);
+      line-height: 1.65;
+      margin-bottom: 1.2rem;
+    }
+    .pricing-tag {
+      display: inline-block;
+      border: 1px solid rgba(200,169,106,.4);
+      color: var(--gold);
+      font-family: var(--calibri);
+      font-size: .72rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: .3rem .8rem;
+    }
+
+    /* ── CONTACT CTA ── */
+    .cta-section {
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-family: var(--slav);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      color: var(--bone);
+      margin-bottom: 1rem;
+      line-height: 1.05;
+    }
+
+    .cta-section h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .cta-section p {
+      font-family: var(--calibri);
+      font-size: 1rem;
+      color: rgba(240,237,232,.5);
+      max-width: 480px;
+      margin: 0 auto 2.8rem;
+      line-height: 1.7;
+    }
+
+    .btn-wa {
+      display: inline-flex; align-items: center; gap: .75rem;
+      background: #25D366;
+      color: #fff;
+      font-family: var(--calibri);
+      font-size: .95rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 1rem 2.5rem;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: transform .25s, box-shadow .25s;
+      clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    }
+    .btn-wa::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(255,255,255,.12);
+      transform: translateX(-100%);
+      transition: transform .3s;
+    }
+    .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(37,211,102,.3); }
+    .btn-wa:hover::after { transform: translateX(0); }
+
+    /* ── SOCIALS ── */
+    .socials-section {
+      padding: 4rem 2rem 5rem;
+      border-top: 1px solid rgba(200,169,106,.1);
+    }
+
+    .socials-label {
+      text-align: center;
+      font-family: var(--calibri);
+      font-size: .72rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,.25);
+      margin-bottom: 2rem;
+    }
+
+    .socials-row {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-link {
+      display: inline-flex; align-items: center; gap: .65rem;
+      text-decoration: none;
+      color: rgba(240,237,232,.55);
+      font-family: var(--calibri);
+      font-size: .95rem;
+      letter-spacing: .05em;
+      transition: color .25s;
+      padding: .5rem 0;
+      border-bottom: 1px solid transparent;
+      transition: color .25s, border-color .25s;
+    }
+    .social-link:hover { color: var(--gold); border-color: rgba(200,169,106,.4); }
+    .social-link svg { flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-family: var(--calibri);
+      font-size: .72rem;
+      letter-spacing: .1em;
+      color: rgba(240,237,232,.18);
+      border-top: 1px solid rgba(255,255,255,.04);
+      position: relative; z-index: 1;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .about {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .about-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HERO ══ -->
+  <header>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Arte en tu piel · Playa del Carmen</p>
+
+      <h1 class="hero-title">
+        Yoni<span>s</span>tatto
+      </h1>
+
+      <p class="hero-sub">Donde cada línea cuenta una historia</p>
+
+      <div class="hero-location">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21s-8-5.5-8-11a8 8 0 1116 0c0 5.5-8 11-8 11z"/><circle cx="12" cy="10" r="2.5"/>
+        </svg>
+        Playa del Carmen, Quintana Roo, México
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ ABOUT ══ -->
+  <section>
+    <div class="about">
+      <div class="about-stat">
+        <div class="number">∞</div>
+        <div class="label">Diseños únicos</div>
+      </div>
+
+      <div class="about-divider"></div>
+
+      <div class="about-text">
+        <h2>Tatuajes que nacen contigo</h2>
+        <p>
+          En Yonistatto cada pieza es una colaboración entre el artista y tú.
+          Trabajamos con blackwork, línea fina, geométrico y diseños de autor —
+          piezas únicas que nacen de tu idea y el trazo personal del tatuador,
+          siempre con materiales de primera calidad y máximo cuidado en higiene.
+        </p>
+      </div>
+    </div>
+
+    <!-- Enlace a proyectos.html añadido -->
+    <div class="projects-link-container">
+      <a href="proyectos.html" class="link-projects">Ver proyectos anteriores ➡️</a>
+    </div>
+  </section>
+
+  <div class="ornament" style="position:relative;z-index:1;">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+  <!-- ══ PRICING ══ -->
+  <section class="pricing-section">
+    <div class="section-heading">
+      <h2>¿Cuánto cuesta mi tatuaje?</h2>
+      <p>Cada pieza es única — el precio también</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <span class="icon">✒️</span>
+        <h3>Pequeño</h3>
+        <p>Diseños simples, línea fina o minimalistas. Perfectos para tu primer tatuaje.</p>
+        <span class="pricing-tag">Cotizar con el artista</span>
+      </div>
+
+      <div class="pricing-card">
+        <span class="icon">🖋️</span>
+        <h3>Mediano</h3>
+        <p>Piezas con detalle medio, mangas parciales o composiciones de tamaño moderado.</p>
+        <span class="pricing-tag">Cotizar con el artista</span>
+      </div>
+
+      <div class="pricing-card">
+        <span class="icon">🎨</span>
+        <h3>Grande & Full</h3>
+        <p>Mangas completas, espaldas, murales corporales y proyectos de larga duración.</p>
+        <span class="pricing-tag">Cotizar con el artista</span>
+      </div>
+
+      <div class="pricing-card">
+        <span class="icon">✨</span>
+        <h3>Retoque</h3>
+        <p>Reavivamos piezas antiguas o añadimos detalle a trabajos previos para que brillen de nuevo.</p>
+        <span class="pricing-tag">Cotizar con el artista</span>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:2.5rem;font-family:var(--calibri);font-size:.85rem;color:rgba(240,237,232,.3);letter-spacing:.08em;">
+      El precio depende del tamaño, complejidad y tiempo de sesión.<br>
+      Escríbenos y acordamos juntos lo mejor para tu proyecto.
+    </p>
+  </section>
+
+  <!-- ══ CTA / WHATSAPP ══ -->
+  <section class="cta-section">
+    <h2>¿Listo para tu próxima<br><em>historia</em>?</h2>
+    <p>
+      Cuéntanos tu idea, el estilo que te inspira o el lugar del cuerpo donde
+      quieres llevarla. El artista te responde y ajustamos cada detalle
+      contigo antes de la sesión.
+    </p>
+
+    <a class="btn-wa" href="https://wa.me/526568452105" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/>
+      </svg>
+      Escríbenos por WhatsApp
+    </a>
+  </section>
+
+  <!-- ══ SOCIALS ══ -->
+  <section class="socials-section">
+    <p class="socials-label">Síguenos en redes</p>
+
+    <div class="socials-row">
+      <!-- Instagram -->
+      <a class="social-link" href="https://www.instagram.com/yonistattoo" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+        Yonistattoo
+      </a>
+
+      <!-- TikTok -->
+      <a class="social-link" href="https://www.tiktok.com/@yoninvro?_r=1&_t=ZS-96Ys84WulN4" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34l-.01-8.27a8.16 8.16 0 0 0 4.77 1.52V5.15a4.85 4.85 0 0 1-1-.46z"/>
+        </svg>
+        @yoninvro
+      </a>
+
+      <!-- WhatsApp directo -->
+      <a class="social-link" href="https://wa.me/526568452105" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/>
+        </svg>
+        +52 656 845 2105
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    © 2026 Yonistatto · Playa del Carmen, Quintana Roo · Todos los derechos reservados
+  </footer>
+
+</body>
+</html>
